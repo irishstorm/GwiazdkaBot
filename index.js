@@ -34,11 +34,24 @@ client.on("ready", () => {
 
   commands?.create({
     name: "announcement",
-    description: "Sends a announcement to specific channel",
+    description: "Sends a announcement to specific channel.",
     options: [
       {
         name: "message",
         description: "Please enter the announcement.",
+        required: true,
+        type: Discord.Constants.ApplicationCommandOptionTypes.STRING,
+      },
+    ],
+  });
+
+  commands?.create({
+    name: "debate",
+    description: "Sends a debate message to the debate channel.",
+    options: [
+      {
+        name: "message",
+        description: "Please enter the debate.",
         required: true,
         type: Discord.Constants.ApplicationCommandOptionTypes.STRING,
       },
@@ -70,6 +83,30 @@ client.on("interactionCreate", async (interaction) => {
       ) {
         client.channels.cache.get(channelId).send({ embeds: [embed] });
         interaction.reply({ content: "Announcement sent", ephemeral: true });
+      } else {
+        await interaction.reply({
+          content: "You do not have the permissions to use this command.",
+          ephemeral: true,
+        });
+      }
+      break;
+
+    case "debate":
+      const debate = options.getString("message");
+      const debateChannelId = "756351015166410894";
+
+      const embed1 = new MessageEmbed()
+        .setAuthor({
+          name: "Gwiazdka Bot",
+        })
+        .setDescription(debate)
+        .setTimestamp();
+
+      if (
+        interaction.member.roles.cache.some((role) => role.name === "Admin")
+      ) {
+        client.channels.cache.get(debateChannelId).send({ embeds: [embed1] });
+        interaction.reply({ content: "Debate sent", ephemeral: true });
       } else {
         await interaction.reply({
           content: "You do not have the permissions to use this command.",
