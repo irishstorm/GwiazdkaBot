@@ -4,120 +4,44 @@
     Author: irishstorm#2799
     Date: 09/07/2022
 */
+const { Client, Intents, Collection } = require("discord.js");
+const { REST } = require("@discordjs/rest");
+const { Routes } = require("discord-api-types/v9");
+const fs = require("fs");
 
-import Discord, { Intents, TextChannel, MessageEmbed } from "discord.js";
-import dotenv from "dotenv";
+require("dotenv").config();
 
-dotenv.config();
-
-//  Intents
-const client = new Discord.Client({
+const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 });
 
-client.on("ready", () => {
-  console.log(`Logged in as ${client.user.tag}!`);
+//  Command Handler
+const commandFiles = fs
+  .readdirSync("./commands")
+  .filter((file) => file.endsWith(".js"));
 
-  //  Sets the bots status and activities
-  client.user.setPresence({
-    activities: [{ name: "with Gwiazdka" }],
-    status: "idle",
-  });
+const commands = [];
+client.commands = new Collection();
 
-  const guildID = "753300601001214063";
-  const guild = client.guilds.cache.get(guildID);
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  commands.push(command.data.toJSON());
+  client.commands.set(command.data.name, command);
+}
 
-  //client.application.commands.set([]);
-  //guild.commands.set([]);
+// Event Handler
+const eventFiles = fs
+  .readdirSync("./events")
+  .filter((file) => file.endsWith(".js"));
 
-  let commands = guild.commands;
+for (const file of eventFiles) {
+  const event = require(`./events/${file}`);
 
-  commands?.create({
-    name: "announcement",
-    description: "Sends a announcement to specific channel.",
-    options: [
-      {
-        name: "message",
-        description: "Please enter the announcement.",
-        required: true,
-        type: Discord.Constants.ApplicationCommandOptionTypes.STRING,
-      },
-    ],
-  });
-
-  commands?.create({
-    name: "debate",
-    description: "Sends a debate message to the debate channel.",
-    options: [
-      {
-        name: "message",
-        description: "Please enter the debate.",
-        required: true,
-        type: Discord.Constants.ApplicationCommandOptionTypes.STRING,
-      },
-    ],
-  });
-});
-
-client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isCommand()) {
-    return;
+  if (event.once) {
+    client.once(event.name, (...args) => event.execute(...args, commands));
+  } else {
+    client.on(event.name, (...args) => event.execute(...args, commands));
   }
-
-  const { commandName, options } = interaction;
-
-  switch (commandName) {
-    case "announcement":
-      const announcement = options.getString("message");
-      const channelId = "756028306494717973";
-
-      const embed = new MessageEmbed()
-        .setAuthor({
-          name: "Gwiazdka Bot",
-        })
-        .setDescription(announcement)
-        .setTimestamp();
-
-      if (
-        interaction.member.roles.cache.some((role) => role.name === "Admin")
-      ) {
-        client.channels.cache.get(channelId).send({ embeds: [embed] });
-        interaction.reply({ content: "Announcement sent", ephemeral: true });
-      } else {
-        await interaction.reply({
-          content: "You do not have the permissions to use this command.",
-          ephemeral: true,
-        });
-      }
-      break;
-
-    case "debate":
-      const debate = options.getString("message");
-      const debateChannelId = "756351015166410894";
-
-      const embed1 = new MessageEmbed()
-        .setAuthor({
-          name: "Gwiazdka Bot",
-        })
-        .setDescription(debate)
-        .setTimestamp();
-
-      if (
-        interaction.member.roles.cache.some((role) => role.name === "Admin")
-      ) {
-        client.channels.cache.get(debateChannelId).send({ embeds: [embed1] });
-        interaction.reply({ content: "Debate sent", ephemeral: true });
-      } else {
-        await interaction.reply({
-          content: "You do not have the permissions to use this command.",
-          ephemeral: true,
-        });
-      }
-      break;
-
-    default:
-      break;
-  }
-});
+}
 
 client.login(process.env.TOKEN);
