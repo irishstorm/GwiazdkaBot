@@ -8,7 +8,7 @@ module.exports = {
     if (message.author.bot) return;
 
     const Log = new MessageEmbed().setDescription(
-      `A message by ${
+      `A [message](${message.url}) by ${
         message.author.tag
       } was **deleted**.\n**Deleted Message**\n ${
         message.content ? message.content : "Message could not be found."
