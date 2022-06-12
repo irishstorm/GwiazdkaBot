@@ -8,14 +8,17 @@ module.exports = {
     if (message.author.bot) return;
 
     const Log = new MessageEmbed()
+      .setColor("#0099ff")
+      .setTitle("Message Deleted")
       .setDescription(
-        `A message by **${
-          message.author.tag
-        }** was **deleted**.\n**Deleted Message**\n ${
-          message.content ? message.content : "Message could not be found."
-        }`.slice(0, 4096)
+        `${message.author} deleted a message in ${message.channel}`
       )
-      .setThumbnail(message.author.displayAvatarURL());
+      .setThumbnail(message.author.displayAvatarURL())
+      .setTimestamp()
+      .setFooter({
+        name: message.author.tag,
+        icon_url: message.author.displayAvatarURL(),
+      });
 
     if (message.attachments.size >= 1) {
       Log.addField(
