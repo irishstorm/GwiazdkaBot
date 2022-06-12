@@ -13,7 +13,7 @@ module.exports = {
       .setDescription(
         `${message.author} deleted a message in ${
           message.channel
-        }\n **Message**:${
+        }\n **Message** : ${
           message.content ? message.content : "Message could not be found."
         }`.slice(0, 4096)
       )
