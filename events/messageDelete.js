@@ -11,7 +11,11 @@ module.exports = {
       .setColor("#0099ff")
       .setTitle("Message Deleted")
       .setDescription(
-        `${message.author} deleted a message in ${message.channel}`
+        `${message.author} deleted a message in ${
+          message.channel
+        }\n **Message**:${
+          message.content ? message.content : "Message could not be found."
+        }`.slice(0, 4096)
       )
       .setThumbnail(message.author.displayAvatarURL())
       .setTimestamp()
