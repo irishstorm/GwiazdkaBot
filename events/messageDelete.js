@@ -23,6 +23,14 @@ module.exports = {
       );
     }
 
+    if (message.embeds.length >= 1) {
+      Log.addField("Embeds: ", `${message.embeds.map((e) => e.url)}`, true);
+    }
+
+    if (message.author.avatarURL) {
+      Log.setThumbnail(message.author.avatarURL);
+    } else Log.setThumbnail(message.author.defaultAvatarURL);
+
     new WebhookClient({ url: process.env.WEBHOOKURL })
       .send({ embeds: [Log] })
       .catch((error) => console.log(error));
