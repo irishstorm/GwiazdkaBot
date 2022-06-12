@@ -27,7 +27,7 @@ module.exports = {
       Log.addField("Embeds: ", `${message.embeds.map((e) => e.url)}`, true);
     }
 
-    if (message.author.avatarURL) {
+    if (message.content) {
       Log.setThumbnail(message.author.avatarURL);
     } else Log.setThumbnail(message.author.defaultAvatarURL);
 
