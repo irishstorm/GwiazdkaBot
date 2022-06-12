@@ -15,7 +15,7 @@ module.exports = {
       )
       .setThumbnail(message.author.displayAvatarURL())
       .setTimestamp()
-      .setFooter({
+      .setAuthor({
         name: message.author.tag,
         icon_url: message.author.displayAvatarURL(),
       });
